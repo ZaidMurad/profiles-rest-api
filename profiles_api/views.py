@@ -3,8 +3,10 @@ from rest_framework.views import APIView
 from rest_framework.response import Response #used to return responses from APIViews
 from rest_framework import status #it is a list of handy HTTP status codes that you can use when returning responses from your api
 from rest_framework import viewsets
-from rest_framework.authentication import TokenAuthentication # it works by generting a random token string when the user login and this is added with every request we make (like a password to check every request we make)
+from rest_framework.authentication import TokenAuthentication # it works by generting a random token string when the user login and this is added  in the headers with every request made (like a password to check every request we make)
 from rest_framework import filters # used to add search capability by name, email, or anything
+from rest_framework.authtoken.views import ObtainAuthToken # Used to generate the auth token
+from rest_framework.settings import api_settings
 
 from . import models, serializers, permissions
 
@@ -108,3 +110,8 @@ class UserProfileViewSet(viewsets.ModelViewSet): # the model viewset is specific
     permission_classes = (permissions.UpdateOwnProfile,) # Calls our permissions class in permissions.py
     filter_backends = (filters.SearchFilter,) # must be a tuple too, you can add one or more filter backends
     search_fields = ('name', 'email',) # fields we want to search the view set by
+
+
+class UserLoginApiView(ObtainAuthToken): # the ObtainAuthToken could be added directly to a url in urls.py, but it doesn't by default enable itself in the browsable django api site thats why we need to override it so that its visible in the browsable api for testing purposes
+    """Handle creating user authentication tokens"""
+    renderer_classes = api_settings.DEFAULT_RENDERER_CLASSES # it adds the renderer classes to our ObtainAuthToken view which will enable it in the django admin, the rest of things like viewsets have this by default but the ObtainAuthToken doesn't
