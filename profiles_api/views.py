@@ -2,8 +2,12 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response #used to return responses from APIViews
 from rest_framework import status #it is a list of handy HTTP status codes that you can use when returning responses from your api
-from . import serializers
 from rest_framework import viewsets
+from rest_framework.authentication import TokenAuthentication # it works by generting a random token string when the user login and this is added with every request we make (like a password to check every request we make)
+from rest_framework import filters # used to add search capability by name, email, or anything
+
+from . import models, serializers, permissions
+
 # Create your views here.
 
 class HelloApiView(APIView): #allows us to define the app logic for our endpoint we assign to this view
@@ -94,3 +98,13 @@ class HelloViewSet(viewsets.ViewSet):
     def destroy(self, request, pk=None):
         """Handle removing an object"""
         return Response({'http_method': 'DELETE'})
+
+
+class UserProfileViewSet(viewsets.ModelViewSet): # the model viewset is specifically designed for managing models through our API by having all the functionality we need for managing models
+    """Handle creating and updating profiles"""
+    serializer_class = serializers.UserProfileSerializer
+    queryset = models.UserProfile.objects.all() # this is provided so that the model view set knows which objects in the DB will be managed by this viewset
+    authentication_classes = (TokenAuthentication,) # must be a tuple, you can assign one or more type of authentication to one viewset
+    permission_classes = (permissions.UpdateOwnProfile,) # Calls our permissions class in permissions.py
+    filter_backends = (filters.SearchFilter,) # must be a tuple too, you can add one or more filter backends
+    search_fields = ('name', 'email',) # fields we want to search the view set by
