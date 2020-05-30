@@ -7,6 +7,8 @@ from rest_framework.authentication import TokenAuthentication # it works by gene
 from rest_framework import filters # used to add search capability by name, email, or anything
 from rest_framework.authtoken.views import ObtainAuthToken # Used to generate the auth token
 from rest_framework.settings import api_settings
+#from rest_framework.permissions import IsAuthenticatedOrReadOnly
+from rest_framework.permissions import IsAuthenticated
 
 from . import models, serializers, permissions
 
@@ -115,3 +117,15 @@ class UserProfileViewSet(viewsets.ModelViewSet): # the model viewset is specific
 class UserLoginApiView(ObtainAuthToken): # the ObtainAuthToken could be added directly to a url in urls.py, but it doesn't by default enable itself in the browsable django api site thats why we need to override it so that its visible in the browsable api for testing purposes
     """Handle creating user authentication tokens"""
     renderer_classes = api_settings.DEFAULT_RENDERER_CLASSES # it adds the renderer classes to our ObtainAuthToken view which will enable it in the django admin, the rest of things like viewsets have this by default but the ObtainAuthToken doesn't
+
+
+class UserProfileFeedViewSet(viewsets.ModelViewSet):
+    """Handles creating, reading, and updating profile feed items"""
+    serializer_class = serializers.ProfileFeedItemSerializer
+    authentication_classes = (TokenAuthentication,)
+    queryset = models.ProfileFeedItem.objects.all()
+    permission_classes = (permissions.UpdateOwnStatus, IsAuthenticated)
+
+    def perform_create(self, serializer): # its a feature of DRF to customize the behaviour for creating objects through a model viewset. this gets called everytime you make HTTP post. we have to add this since we want only authenticated users to deal with their posts
+        """Sets the user profile to the logged in user"""
+        serializer.save(user_profile=self.request.user) # model serializers has a save function assign to it. the request object gets passed to all viewsets everytime a request is made and contains info about them, including the user.

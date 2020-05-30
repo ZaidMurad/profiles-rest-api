@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.auth.models import AbstractBaseUser
 from django.contrib.auth.models import PermissionsMixin
 from django.contrib.auth.models import BaseUserManager
+from profiles_project import settings # settings.py file in our project folder. MARK used here (from django.conf import settings)
 
 #These are the standard base classes you need when overriding the default django user models
 
@@ -55,3 +56,17 @@ class UserProfile(AbstractBaseUser, PermissionsMixin):
     def __str__(self): #optional (recommended always)
         """Return string representation of our user"""
         return self.email
+
+
+class ProfileFeedItem(models.Model):
+    """Profile status update"""
+    user_profile = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete = models.CASCADE,
+    ) # associated with the users who created the feed item
+    status_text = models.CharField(max_length=255) # content of the feed item
+    created_on = models.DateTimeField(auto_now_add=True) # current time when the item was created
+
+    def __str__(self):
+        """Return the model as a string"""
+        return self.status_text

@@ -39,10 +39,10 @@ class UserProfileSerializer(serializers.ModelSerializer):
         return super().update(instance, validated_data) # to pass the values to the existing default DRF update() method, to handle updating the remaining fields.
 
 
-#class ProfileFeedItemSerializer(serializers.ModelSerializer):
-#    """Serializes profile feed items"""
-#
-#    class Meta:
-#        model = models.ProfileFeedItem
-#        fields = ('id', 'user_profile', 'status_text', 'created_on')
-#        extra_kwargs = {'user_profile': {'read_only': True}}
+class ProfileFeedItemSerializer(serializers.ModelSerializer):
+    """Serializes profile feed items"""
+
+    class Meta:
+        model = models.ProfileFeedItem
+        fields = ('id', 'user_profile', 'status_text', 'created_on') # id is automatically set to read only by default always, created_on is read only too since its set automatically
+        extra_kwargs = {'user_profile': {'read_only': True}} # we don't want the user to be able to change the post from one user to another
