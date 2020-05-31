@@ -60,9 +60,9 @@ class UserProfile(AbstractBaseUser, PermissionsMixin):
 
 class ProfileFeedItem(models.Model):
     """Profile status update"""
-    user_profile = models.ForeignKey(
-        settings.AUTH_USER_MODEL,
-        on_delete = models.CASCADE,
+    user_profile = models.ForeignKey( # this is how you link two models together
+        settings.AUTH_USER_MODEL, # you can write the linked model directly, but this is better so that if you change the user model in the future, you don't have to manually change your code here
+        on_delete = models.CASCADE, # if the user profile is deleted, cascade the change to delete the associated feed items too. another option is set_null 
     ) # associated with the users who created the feed item
     status_text = models.CharField(max_length=255) # content of the feed item
     created_on = models.DateTimeField(auto_now_add=True) # current time when the item was created

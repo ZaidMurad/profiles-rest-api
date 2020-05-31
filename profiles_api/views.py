@@ -7,7 +7,7 @@ from rest_framework.authentication import TokenAuthentication # it works by gene
 from rest_framework import filters # used to add search capability by name, email, or anything
 from rest_framework.authtoken.views import ObtainAuthToken # Used to generate the auth token
 from rest_framework.settings import api_settings
-#from rest_framework.permissions import IsAuthenticatedOrReadOnly
+#from rest_framework.permissions import IsAuthenticatedOrReadOnly # we replaced it with the line below it
 from rest_framework.permissions import IsAuthenticated
 
 from . import models, serializers, permissions
@@ -124,8 +124,8 @@ class UserProfileFeedViewSet(viewsets.ModelViewSet):
     serializer_class = serializers.ProfileFeedItemSerializer
     authentication_classes = (TokenAuthentication,)
     queryset = models.ProfileFeedItem.objects.all()
-    permission_classes = (permissions.UpdateOwnStatus, IsAuthenticated)
+    permission_classes = (permissions.UpdateOwnStatus, IsAuthenticated,)
 
-    def perform_create(self, serializer): # its a feature of DRF to customize the behaviour for creating objects through a model viewset. this gets called everytime you make HTTP post. we have to add this since we want only authenticated users to deal with their posts
-        """Sets the user profile to the logged in user"""
-        serializer.save(user_profile=self.request.user) # model serializers has a save function assign to it. the request object gets passed to all viewsets everytime a request is made and contains info about them, including the user.
+    def perform_create(self, serializer): # its a feature of DRF to customize the behaviour for creating objects through a model viewset. this gets called everytime an object is created (you make HTTP post). we have to add this since we want only authenticated users to deal with their posts
+        """Sets the user profile to the logged in user""" # perform_create is called within the create method to call the serializer for creation once it's known the serialization is valid.
+        serializer.save(user_profile = self.request.user) # model serializers has a save function assigned to it. the request object gets passed to all viewsets everytime a request is made and contains info about them, since we are using TokenAuthentication, the request will include the user who created the feed too.

@@ -44,5 +44,5 @@ class ProfileFeedItemSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = models.ProfileFeedItem
-        fields = ('id', 'user_profile', 'status_text', 'created_on') # id is automatically set to read only by default always, created_on is read only too since its set automatically
+        fields = ('id', 'user_profile', 'status_text', 'created_on') # id is automatically set to read only always by default, created_on is read only too since its set automatically
         extra_kwargs = {'user_profile': {'read_only': True}} # we don't want the user to be able to change the post from one user to another
